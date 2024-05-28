@@ -1,0 +1,5 @@
+*.log
+*.csv
+.env
+__pycache__/
+airflow_blackbird/postgres/

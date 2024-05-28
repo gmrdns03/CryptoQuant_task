@@ -1,0 +1,83 @@
+# 여기서는 워커들이 모두 같은 서버 내부에서 작동하기 때문에 워커들의 dag, plugin 폴더 볼륨을 같은 경로로 설정했다.
+# 워커를 다른 곳에 설치할 경우 해당 환경에 적합하게 볼륨설 설정할 필요가 있다.
+version: '3.8'
+
+x-airflow-common:
+  &airflow-common
+  image: ${C_FLOW_WORKER_IMAGE:-custom-airflow:latest}
+  # build:
+  #   context: ./airflow
+  #   dockerfile: Dockerfile-worker
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION}
+    AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES}
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW__CORE__DEFAULT_TIMEZONE:-Asia/Seoul}
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: ${AIRFLOW__CORE__ENABLE_XCOM_PICKLING:-'true'}
+    AIRFLOW__LOGGING__LOGGING_LEVEL: ${AIRFLOW__LOGGING__LOGGING_LEVEL}
+    AIRFLOW__LOGGING__CELERY_LOGGING_LEVEL: ${AIRFLOW__LOGGING__CELERY_LOGGING_LEVEL}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-''}
+    AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: ${AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE:-Asia/Seoul}
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: ${AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK}
+    AIRFLOW__CELERY__RESULT_BACKEND: ${AIRFLOW__CELERY__RESULT_BACKEND}
+    AIRFLOW__CELERY__BROKER_URL: ${AIRFLOW__CELERY__BROKER_URL}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+    AIRFLOW__API__AUTH_BACKENDS: ${AIRFLOW__API__AUTH_BACKENDS}
+    DUMB_INIT_SETSID: "0"
+  volumes:
+      - ${AIRFLOW_PJT_DIR:-./airflow}/dags:/opt/airflow/dags
+      - ${AIRFLOW_WORKER_DIR:-./workers}/w1/logs:/opt/airflow/logs
+      - ${AIRFLOW_PJT_DIR:-./airflow}/plugins:/opt/airflow/plugins
+      - ${AIRFLOW_PJT_DIR:-./airflow}/files:/opt/airflow/files
+  user: "${AIRFLOW_UID:-50000}:0"
+
+services:
+  # airflow-worker:
+  #   <<: *airflow-common
+  #   command: celery worker
+  #   healthcheck:
+  #     test:
+  #       - "CMD-SHELL"
+  #       - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   environment:
+  #     <<: *airflow-common-env
+  #     # Required to handle warm shutdown of the celery workers properly
+  #     # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+  #     DUMB_INIT_SETSID: "0"
+  #   restart: always
+
+
+  airflow-worker-1:
+    <<: *airflow-common
+    container_name: c-flow-worker-1
+    command: airflow celery worker --celery-hostname worker1@%h
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "worker1@$${HOSTNAME}"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+
+  airflow-worker-2:
+    <<: *airflow-common
+    container_name: c-flow-worker-2
+    command: airflow celery worker --celery-hostname worker2@%h
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "worker2@$${HOSTNAME}"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
