@@ -77,7 +77,7 @@
 
             # core
             AIRFLOW__CORE__EXECUTOR=CeleryExecutor
-            AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://{}:{}@{}:5432/airflow
+            AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://{}:{}@{}:{}/airflow
             AIRFLOW__CORE__FERNET_KEY=''
             AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true'
             AIRFLOW__CORE__LOAD_EXAMPLES='false'
