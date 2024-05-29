@@ -97,7 +97,7 @@
 
             # celery
             AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://{}:{}@{}:{}/airflow
-            AIRFLOW__CELERY__BROKER_URL=redis://:@172.7.0.28:6379/0
+            AIRFLOW__CELERY__BROKER_URL=redis://:@{}:{}/0
 
             # database
             AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://{}:{}@{}:{}/airflow
