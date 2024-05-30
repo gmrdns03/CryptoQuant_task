@@ -167,7 +167,7 @@
     ```
 
     - 획득한 FERNET_KEY, SECRET_KEY 를 lime-flow/.env 환경변수 파일안에 `AIRFLOW__CORE__FERNET_KEY`와 `AIRFLOW__WEBSERVER__SECRET_KEY`에 각각 집어 넣는다.
-5. 변경사항을 lime-flow-primary-node에 적용
+5. 변경사항을 c-flow-primary-node에 적용
 
 ```bash
 docker compose -f ./lime-flow/docker-compose-primary.yml up --build --force-recreate -d airflow-init
@@ -178,20 +178,17 @@ docker compose -f ./lime-flow/docker-compose-primary.yml up --build --force-recr
 # 4. lime-flow-worker-node 설치
 
 - 설치목록
-    - lime-flow-worker-1
-    - lime-flow-worker-2
-    - lime-flow-worker-3
-    - lime-flow-worker-4
-    - lime-flow-worker-5
+    - c-flow-worker-1
+    - c-flow-worker-2
 
 1. 환경변수 셋팅
-    1. lime-flow-primary-node 설치시 환경변수 파일과 동일
+    1. c-flow-primary-node 설치시 환경변수 파일과 동일
 
 1. 도커 이미지 빌드
-    1. lime-flow-primary-node와 같은 이미지 사용
+    1. c-flow-primary-node와 같은 이미지 사용
 
 2. 이미지 실행
 
 ```bash
-docker compose -f ./lime-flow/docker-compose-worker.yml up -d
+docker compose -f ./docker-compose-worker.yml up -d
 ```
