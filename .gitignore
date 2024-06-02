@@ -4,3 +4,4 @@
 __pycache__/
 airflow_blackbird/postgres/
 .sock
+logs/
