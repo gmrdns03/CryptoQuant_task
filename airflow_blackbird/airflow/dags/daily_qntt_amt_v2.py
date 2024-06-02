@@ -129,7 +129,7 @@ def _qntt_data_et(conn_id, user_addr, token_addr, col_str_dt, col_end_dt, ts_nod
 
 
 with DAG (
-    'daily_Quantity_amount_checker',
+    'daily_Quantity_amount_checker_v2',
     default_args=default_args,
     description='계정의 일별 보유량 확인 DAG',
     schedule_interval='@once',
